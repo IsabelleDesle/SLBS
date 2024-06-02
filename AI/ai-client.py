@@ -6,7 +6,6 @@ import numpy as np
 import cv2 as cv
 import time
 
-
 # from IPython.display import Video
 
 import asyncio
@@ -18,7 +17,6 @@ from queue import Queue
 import threading
 import time
 #from BLE_client import run
-import cv2  # Importing the OpenCV library for computer vision tasks.
 import supervision as sv  # Importing a module named supervision as sv.
 
 # Importing YOLO object detection model from ultralytics library.
@@ -32,15 +30,11 @@ def analyze_photo():
 
             # Model 
     
-    path01 = "C:\\Users\\desle\\LOCAL_206_PROJECT_ONE\\trained_models_yolov8\\Laundry.v3i.yolov8\\runs\\detect\\train10\\weights\\best.pt"
-    path02 = "C:\\Users\\desle\\OneDrive\\TRAINING\\runs\\detect\\train7\\weights\\best.pt"
     path03="C:\\Users\\desle\\runs\\detect\\train4\\weights\\best.pt"
     # path 03 is the best model so far
     path04= "C:\\Users\\desle\\runs\\detect\\train\\weights\\best.pt"
-    path05= "C:\\Users\\desle\\LOCAL_206_PROJECT_ONE\\trained_models_yolov8\\Laundry.v3i.yolov8\\runs\\detect\\train10\\weights\\best.pt"
-        
-    model = YOLO(path03)
 
+    model = YOLO(path03)
 
     # accepts all formats - image/dir/Path/URL/video/PIL/ndarray. 0 for webcam
     #result = model.predict("C:\\Users\\desle\\OneDrive\\004_PROJECT_ONE\\motion_detection_photos\\throwing_laundry.mp4", save=True)  # save predictions as labels
@@ -100,11 +94,10 @@ def analyze_photo():
                 print("NOT RECOGNIZED1")
                 laundryList["not recognized"] += 1
                 #continue
-                
+               
 
         else:
             if detection_by_threshold_list[im] != detection_by_threshold_list[im-1]:
-                #print("NOT THE SAME")
                 
                 photos_to_analyze.append(detection_by_threshold_list[im])
                 try:
@@ -112,10 +105,12 @@ def analyze_photo():
                     laundryList[Predictionnames[detection_by_threshold_list[im].class_id[0]]] += 1
                 except:
 
-                    print("NOT RECOGNNIZED2")
+                    print("NOT RECOGNIZED2")
                     laundryList["not recognized"] += 1
                     
             else:
+                # when motion is detected but nothing has been added
+                # photo is the same as the previous photo
                 print("SAME")
                 laundryList["nothing added"] += 1
                 #continue
@@ -123,7 +118,7 @@ def analyze_photo():
                 
     print("")  
 
-    # let us some time to read this information
+    # let us some time to read this information (sleep(5))
     print("\n\n")
     os.system('cls' if os.name == 'nt' else 'clear')
     # print("LEN RESULTS: NR OF PHOTOS:", len(result))
@@ -131,12 +126,6 @@ def analyze_photo():
     print(f"DETECTED PHOTOS BY THRESHOLD {conf_threshold} : {len(detection_by_threshold_list)}")
     print("NUMBER OF UNIQUE PHOTOS:", len(photos_to_analyze))
     print(laundryList)
-
-    # for k,v in laundryList.items():
-    #     if int(v) > 5:
-    #         print("START MACHINE FOR ", k)
-           
-            
     sleep(5)
 
 
@@ -148,46 +137,21 @@ def analyze_photo():
             for key, value in laundryList.items():
                 writer.writerow([key, value])
 
-
         except:
             print("could not write to csv")
-
     
      #close the csv 
     csv_file.close()
-   
-    
+       
     return laundryList
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 server_address = ('192.168.168.167', 8500)  # Connect to RPi (or other server) on ip ... and port ... (the port is set in server.py)
 # the ip address can also be the WiFi ip of your RPi, but this can change. You can print your WiFi IP on your LCD? (if needed)
-
 
 # Global vars for use in methods/threads
 client_socket = None
 receive_thread = None
 shutdown_flag = threading.Event() # see: https://docs.python.org/3/library/threading.html#event-objects
-
 
 def setup_socket_client():
     global client_socket, receive_thread
@@ -207,7 +171,7 @@ def receive_messages(sock, shutdown_flag):
                 data = sock.recv(1024) # try to receive 1024 bytes of data (maximum amount; can be less)
                 if not data: # when no data is received, try again (and shutdown flag is checked again)
                     break
-                #print("Received from server:", data.decode()) # print the received data, or do something with it
+                
                 if data.decode() == "0":
                     #print("")
                     continue
@@ -239,7 +203,7 @@ def receive_messages(sock, shutdown_flag):
                     cap.release()
                     # out.release()
                     cv.destroyAllWindows()
- 
+
                 for k,v in all_laundry.items():
                     if int(v) > 5:
                         print("START MACHINE FOR: ", k)
@@ -247,9 +211,7 @@ def receive_messages(sock, shutdown_flag):
                         sock.sendall(response.encode())
                 
                 counter += 1 # up the count by 1
-                #response = "{} message(s) received".format(counter) # create a response string
-                
-                #sock.sendall(response.encode()) # encode and send the data
+
             except socket.timeout: # when no data comes within timeout, try again
                 continue
 
@@ -259,21 +221,8 @@ def receive_messages(sock, shutdown_flag):
     finally:
         sock.close()
 
-
-
-
-
-
-
-
-
-
-
-
-
 def main():
     global client_socket, receive_thread
-
     setup_socket_client()
 
     if client_socket is None:
@@ -282,14 +231,11 @@ def main():
     
     # send "hello I'm connected" message
     client_socket.sendall("Hello from AI".encode()) # send a "connected" message from client > server
-        
 
     try:
         while True: # random loop for other things
             time.sleep(0.1)
             #print(" ")
-            
-
 
     except KeyboardInterrupt:
         print("Client disconnecting...")
