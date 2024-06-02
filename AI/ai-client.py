@@ -24,8 +24,6 @@ from ultralytics import YOLO
 import gradio as gr  # Importing Gradio library for creating web interfaces.
 from PIL import Image
 
-
-
 def analyze_photo():
 
             # Model 
@@ -248,3 +246,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+# a lot of thanks to all the teachers at Howest. Thank you Pieter Jan, Marie, Stijn, Claudia, Frederik, Geert, Tijn, Wouter and so many others...! 
