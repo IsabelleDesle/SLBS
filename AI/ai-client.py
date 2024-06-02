@@ -205,7 +205,8 @@ def receive_messages(sock, shutdown_flag):
                     cv.destroyAllWindows()
 
                 for k,v in all_laundry.items():
-                    if int(v) > 5:
+                            #value is 10, but can be changed depending on wasgin machine and washing program
+                    if int(v) > 10:
                         print("START MACHINE FOR: ", k)
                         response = "start machine   {}".format(k)
                         sock.sendall(response.encode())
